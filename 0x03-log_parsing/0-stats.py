@@ -1,52 +1,46 @@
 #!/usr/bin/python3
-"""
-This module contains a method that reads stdin line by line and
-computes metrics
-"""
-import dis
+""" Reads stdin line by line and computes metrics """
+
 import sys
 
 
-def display_metrics(total_size, status_code):
-    """
-    Function that print the metrics
-    """
+status_code = {"200": 0,\
+               "301": 0,\
+               "400": 0,\
+               "401": 0,\
+               "403": 0,\
+               "404": 0,\
+               "405": 0,\
+               "500": 0}
+count = 1
+file_size = 0
 
-    print('File size: {}'.format(total_size))
-    for key, value in sorted(status_code.items()):
-        if value != 0:
-            print('{}: {}'.format(key, value))
-
-
-if __name__ == '__main__':
-    total_size = 0
-    status_code = {
-        '200': 0,
-        '301': 0,
-        '400': 0,
-        '401': 0,
-        '403': 0,
-        '404': 0,
-        '405': 0,
-        '500': 0
-    }
-
+def get_size(line):
+    """ Get file size of each line """
     try:
-        i = 0
-        for line in sys.stdin:
-            args = line.split()
-            if len(args) > 6:
-                status = args[-2]
-                file_size = args[-1]
-                total_size += int(file_size)
-                if status in status_code:
-                    i += 1
-                    status_code[status] += 1
-                    if i % 10 == 0:
-                        display_metrics(total_size, status_code)
+        line_arr = line.split()
+        code = line_arr[-2]
+        if code in status_code.keys():
+            status_code[code] += 1
+        return int(line_arr[-1])
+    except Exception:
+        return 0
 
+def print_metrics():
+    """ Print line metrics """
+    print("File size: {}".format(file_size))
+    for key in sorted(status_code.keys()):
+        if status_code[key]:
+            print("{}: {}".format(key, status_code[key]))
+
+if __name__ == "__main__":
+    try:
+        for line in sys.stdin:
+            file_size += get_size(line)
+            if count % 10 == 0:
+                print_metrics()
+            count += 1
     except KeyboardInterrupt:
-        display_metrics(total_size, status_code)
+        print_metrics()
         raise
-    else:
-        display_metrics(total_size, status_code)
+    print_metrics()
