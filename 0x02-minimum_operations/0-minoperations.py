@@ -1,25 +1,31 @@
 #!/usr/bin/python3
-""" Module for 0-minoperations"""
+"""A module to find the minimun operations
+to deplicate H n times"""
 
 
 def minOperations(n):
-    """
-    minOperations
-    Gets fewest # of operations needed to result in exactly n H characters
-    """
-    # all outputs should be at least 2 char: (min, Copy All => Paste)
-    if (n < 2):
-        return 0
-    ops, root = 0, 2
-    while root <= n:
-        # if n evenly divides by root
-        if n % root == 0:
-            # total even-divisions by root = total operations
-            ops += root
-            # set n to the remainder
-            n = n / root
-            # reduce root to find remaining smaller vals that evenly-divide n
-            root -= 1
-        # increment root until it evenly-divides n
-        root += 1
-    return ops
+    """A function returns a number of
+    operations taken to get H n time"""
+    "number of H's"
+    nh = 1
+    "previous copied number of H's"
+    copied = 0
+    "number of operations"
+    nop = 0
+
+    while (nh < n):
+        "remainder as rem"
+        rem = n - nh
+        if (rem % nh == 0):
+            "copy the current value"
+            copied = nh
+            "past the current value"
+            nh += copied
+            "copy and past are the two operations"
+            nop += 2
+        else:
+            "pass the previous value"
+            nh += copied
+            "pass is the only operation 1"
+            nop += 1
+    return nop
