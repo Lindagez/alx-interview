@@ -1,46 +1,37 @@
 #!/usr/bin/python3
-""" Reads stdin line by line and computes metrics """
+'''a script that reads stdin line by line and computes metrics'''
+
 
 import sys
 
+cache = {'200': 0, '301': 0, '400': 0, '401': 0,
+         '403': 0, '404': 0, '405': 0, '500': 0}
+total_size = 0
+counter = 0
 
-status_code = {"200": 0,\
-               "301": 0,\
-               "400": 0,\
-               "401": 0,\
-               "403": 0,\
-               "404": 0,\
-               "405": 0,\
-               "500": 0}
-count = 1
-file_size = 0
+try:
+    for line in sys.stdin:
+        line_list = line.split(" ")
+        if len(line_list) > 4:
+            code = line_list[-2]
+            size = int(line_list[-1])
+            if code in cache.keys():
+                cache[code] += 1
+            total_size += size
+            counter += 1
 
-def get_size(line):
-    """ Get file size of each line """
-    try:
-        line_arr = line.split()
-        code = line_arr[-2]
-        if code in status_code.keys():
-            status_code[code] += 1
-        return int(line_arr[-1])
-    except Exception:
-        return 0
+        if counter == 10:
+            counter = 0
+            print('File size: {}'.format(total_size))
+            for key, value in sorted(cache.items()):
+                if value != 0:
+                    print('{}: {}'.format(key, value))
 
-def print_metrics():
-    """ Print line metrics """
-    print("File size: {}".format(file_size))
-    for key in sorted(status_code.keys()):
-        if status_code[key]:
-            print("{}: {}".format(key, status_code[key]))
+except Exception as err:
+    pass
 
-if __name__ == "__main__":
-    try:
-        for line in sys.stdin:
-            file_size += get_size(line)
-            if count % 10 == 0:
-                print_metrics()
-            count += 1
-    except KeyboardInterrupt:
-        print_metrics()
-        raise
-    print_metrics()
+finally:
+    print('File size: {}'.format(total_size))
+    for key, value in sorted(cache.items()):
+        if value != 0:
+            print('{}: {}'.format(key, value))
